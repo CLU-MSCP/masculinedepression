@@ -1,0 +1,59 @@
+---
+title: "R Code for Thesis"
+author: "Jamie"
+date: "8/13/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Power Analyses for Each Hypothesis
+
+<Discuss your general approach and review the power for each hypothesis.  Insert a new chunk for each hypothesis>
+
+Hypothesis 1: Power for <regression>
+
+```{r}
+
+```
+
+## Data Wrangling including Summarizing
+
+<Discuss your process here>
+
+```{r}
+
+```
+
+
+## Data Visualation
+
+<Explain your graphy here>
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+
+## Data Modeling
+
+1. Restate Hypothesis. Explain analysis.
+
+```{r}
+
+```
+
+2. Restate Hypothesis. Explain analysis.
+
+```{r}
+
+```
+
+3. Restate Hypothesis. Explain analysis.
+
+```{r}
+
+```
+
