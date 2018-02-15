@@ -1,31 +1,218 @@
----
+w---
 title: "R Code for Thesis"
-author: "Jamie"
-date: "8/13/2017"
+author: "Isaac Harosh"
+date: "11/7/2017"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(mediation)
+library(medflex)
+library(car)
+library(ggplot2)
+library(Hmisc)
+library(arm)
+library(boot)
 ```
 
+```{r get data}
+thesis.d <- read.csv("TDTT.csv")
+```
+
+
+
+#Duration
+```{r}
+duration = thesis.d$`Duration (in seconds)`
+mean(duration)
+# 720 seconds = 7 min average
+
+```
+
+#PRE MDS
+#Q128-Q171
+#PREMDS1-PREMDS44
+#(1 = none or little of the time, 2 = some of the time, 3 = most of the time, 4 = all of the time).
+```{r}
+#TOTAL Score prior to Storyline
+thesis.d$PREMDSTOTAL <- thesis.d$PREMDS1 + thesis.d$PREMDS2 + thesis.d$PREMDS3 + thesis.d$PREMDS4 + thesis.d$PREMDS5 + thesis.d$PREMDS6 + thesis.d$PREMDS7 + thesis.d$PREMDS8 + thesis.d$PREMDS9 + thesis.d$PREMDS10 + thesis.d$PREMDS11 + thesis.d$PREMDS12 + thesis.d$PREMDS13 + thesis.d$PREMDS14 + thesis.d$PREMDS15 + thesis.d$PREMDS16 + thesis.d$PREMDS17 + thesis.d$PREMDS18 + thesis.d$PREMDS19 + thesis.d$PREMDS20 + thesis.d$PREMDS21 + thesis.d$PREMDS22 + thesis.d$PREMDS23 + thesis.d$PREMDS24 + thesis.d$PREMDS25 + thesis.d$PREMDS26 + thesis.d$PREMDS27 + thesis.d$PREMDS28 + thesis.d$PREMDS29 + thesis.d$PREMDS30 + thesis.d$PREMDS31 + thesis.d$PREMDS32 + thesis.d$PREMDS33 +thesis.d$PREMDS34 + thesis.d$PREMDS35 + thesis.d$PREMDS36 + thesis.d$PREMDS37 + thesis.d$PREMDS38 + thesis.d$PREMDS39 + thesis.d$PREMDS40 + thesis.d$PREMDS41 + thesis.d$PREMDS42 + thesis.d$PREMDS43 + thesis.d$PREMDS44
+
+thesis.d$PREMDSTOTAL
+### MDS external only
+thesis.d$PREMDSEXTERNAL <- thesis.d$PREMDS34 + thesis.d$PREMDS35 + thesis.d$PREMDS36 + thesis.d$PREMDS37 + thesis.d$PREMDS38 + thesis.d$PREMDS39 + thesis.d$PREMDS40 + thesis.d$PREMDS41 + thesis.d$PREMDS42 + thesis.d$PREMDS43 + thesis.d$PREMDS44
+thesis.d$PREMDSEXTERNAL 
+mean(thesis.d$PREMDSEXTERNAL)
+```
+
+#CMNI
+#1-Q36
+#CM1-CM22
+#(a)  Strongly Disagree(SD)=0, Disagree(D) = 1, Agree(A)= 2, and Strongly Agree(SA) = 3;
+```{r}
+thesis.d$CM3 <-recode(thesis.d$CM3, "0=3; 1=2; 2=1; 3=0; 5=1")
+thesis.d$CM6 <-recode(thesis.d$CM6, "0=3; 1=2; 2=1; 3=0; 5=1")
+thesis.d$CM9 <-recode(thesis.d$CM9, "0=3; 1=2; 2=1; 3=0; 5=1")
+thesis.d$CM10 <-recode(thesis.d$CM12, "0=3; 1=2; 2=1; 3=0; 5=1")
+thesis.d$CM14 <-recode(thesis.d$CM15, "0=3; 1=2; 2=1; 3=0; 5=1")
+thesis.d$CM17 <-recode(thesis.d$CM17, "0=3; 1=2; 2=1; 3=0; 5=1")
+thesis.d$CM20 <-recode(thesis.d$CM20, "0=3; 1=2; 2=1; 3=0; 5=1")
+
+thesis.d$CMTOTAL <- thesis.d$CM1 + thesis.d$CM2 + thesis.d$CM3 + thesis.d$CM4 + thesis.d$CM5 + thesis.d$CM6 + thesis.d$CM7 + thesis.d$CM8 + thesis.d$CM9 + thesis.d$CM10+ thesis.d$CM11 + thesis.d$CM12 + thesis.d$CM13 + thesis.d$CM14 + thesis.d$CM15 + thesis.d$CM16 + thesis.d$CM17 + thesis.d$CM18 + thesis.d$CM19+ thesis.d$CM20+ thesis.d$CM21+ thesis.d$CM22
+thesis.d$CMTOTAL
+
+```
+
+#PRE PHQ-9
+# Q172-Q180
+#PREPHQ1-PREPHQ9
+#"0" (not at all) / "1" several days / "2" More than half the days / "3" (nearly every day).
+#Depression Severity: 0-4 none, 5-9 mild, 10-14 moderate, 15-19 moderately severe, 20-27 severe.
+```{r}
+thesis.d$PREPHQTOTAL <- thesis.d$PREPHQ1 + thesis.d$PREPHQ2 + thesis.d$PREPHQ3 + thesis.d$PREPHQ4 + thesis.d$PREPHQ5 + thesis.d$PREPHQ6 + thesis.d$PREPHQ7 + thesis.d$PREPHQ8 + thesis.d$PREPHQ9
+thesis.d$PREPHQTOTAL
+```
+
+#Post MDS
+# Q38-Q83
+#POSTMDS1-POSTMDS44
+##(1 = none or little of the time, 2 = some of the time, 3 = most of the time, 4 = all of the time).
+```{r}
+### MDS TOTAL
+thesis.d$POSTMDSTOTAL <- thesis.d$POSTMDS1 + thesis.d$POSTMDS2 + thesis.d$POSTMDS3 + thesis.d$POSTMDS4 + thesis.d$POSTMDS5 + thesis.d$POSTMDS6 + thesis.d$POSTMDS7 + thesis.d$POSTMDS8 + thesis.d$POSTMDS9 + thesis.d$POSTMDS10 + thesis.d$POSTMDS11 + thesis.d$POSTMDS12 + thesis.d$POSTMDS13 + thesis.d$POSTMDS14 + thesis.d$POSTMDS15 + thesis.d$POSTMDS16 + thesis.d$POSTMDS17 + thesis.d$POSTMDS18 + thesis.d$POSTMDS19 + thesis.d$POSTMDS20 + thesis.d$POSTMDS21 + thesis.d$POSTMDS22 + thesis.d$POSTMDS23 + thesis.d$POSTMDS24 + thesis.d$POSTMDS25 + thesis.d$POSTMDS26 + thesis.d$POSTMDS27 + thesis.d$POSTMDS28 + thesis.d$POSTMDS29 + thesis.d$POSTMDS30 + thesis.d$POSTMDS31 + thesis.d$POSTMDS32 + thesis.d$POSTMDS33 +thesis.d$POSTMDS34 + thesis.d$POSTMDS35 + thesis.d$POSTMDS36 + thesis.d$POSTMDS37 + thesis.d$POSTMDS38 + thesis.d$POSTMDS39 + thesis.d$POSTMDS40 + thesis.d$POSTMDS41 + thesis.d$POSTMDS42 + thesis.d$POSTMDS43 + thesis.d$POSTMDS44
+
+thesis.d$POSTMDSTOTAL
+### MDS external only
+thesis.d$POSTMDSEXTERNAL <- thesis.d$POSTMDS34 + thesis.d$POSTMDS35 + thesis.d$POSTMDS36 + thesis.d$POSTMDS37 + thesis.d$POSTMDS38 + thesis.d$POSTMDS39 + thesis.d$POSTMDS40 + thesis.d$POSTMDS41 + thesis.d$POSTMDS42 + thesis.d$POSTMDS43 + thesis.d$POSTMDS44
+
+summary(thesis.d$POSTMDSEXTERNAL)
+```
+
+#POST PHQ- 9
+#Q184-Q192
+#POSTPHQ1-POSTPHQ9
+#"0" (not at all) / "1" several days / "2" More than half the days / "3" (nearly every day).
+#Depression Severity: 0-4 none, 5-9 mild, 10-14 moderate, 15-19 moderately severe, 20-27 severe.
+```{r}
+thesis.d$POSTPHQTOTAL <- thesis.d$POSTPHQ1 + thesis.d$POSTPHQ2 + thesis.d$POSTPHQ3 + thesis.d$POSTPHQ4 + thesis.d$POSTPHQ5 + thesis.d$POSTPHQ6 + thesis.d$POSTPHQ7 + thesis.d$POSTPHQ8 + thesis.d$POSTPHQ9
+thesis.d$POSTPHQTOTAL
+mean(thesis.d$POSTPHQTOTAL)
+```
+
+#Summary of the Variables In the Data
+```{r, echo=FALSE}
+summary(thesis.d$PREMDSTOTAL)
+summary(thesis.d$PREMDSEXTERNALSYMPTOMS)
+summary(thesis.d$CMTOTAL)
+summary(thesis.d$PREPHQTOTAL)
+summary(thesis.d$POSTPHQTOTAL)
+summary(thesis.d$POSTMDSTOTAL)
+summary(duration)
+
+```
 ## Power Analyses for Each Hypothesis
 
-<Discuss your general approach and review the power for each hypothesis.  Insert a new chunk for each hypothesis>
+#<Discuss your general approach and review the power for each hypothesis.  Insert a new chunk for each hypothesis>
 
-Hypothesis 1: Power for <regression>
+#Hypothesis 1: Males who rate higher on the Conformity to Masculine Norms Inventory will score higher on the external symptomology scale of the Masculine Depression Scale.
 
+Correlation between CMNI and MDS(External Only)
+```{r}
+cor.test(thesis.d$CMTOTAL, thesis.d$POSTMDSEXTERNAL)#,use ="everything", method = "pearson")
+
+scatter<-ggplot(thesis.d, aes(thesis.d$CMTOTAL, thesis.d$POSTMDSEXTERNAL))
+
+scatter + geom_point(size = 2) + labs(x = "Conformity to Masculine Norms", y = "Masculine depression EXTERNAL SYMPTOMS")
+
+```
+
+#Hypothesis 2: Males who rate higher on a Masculine Conformity Scale will score higher on a Masculine Depression Scale.
+
+## Power Analyses for Each Hypothesis
+```{r}
+cor.test(thesis.d$CMTOTAL, thesis.d$POSTMDSTOTAL, method = "pearson")
+
+
+scatter <- ggplot(thesis.d, aes(CMTOTAL, POSTMDSTOTAL))
+
+scatter + geom_point(size = 2) + labs(x = "Conformity to Masculine Norms", y = "Masculine depression")
+
+```
+
+# Hypothesis 3: Males who report receiving a prior depression diagnosis and also rate lower on the Conformity to Masculine Norms Inventory, will score higher on a traditional scale of depression (Patient Health Questionnaire [PHQ-9]) and lower on the Masculine Depression Scale compared to men without a self-reported history of prior depression diagnosis and also rate higher on the Conformity to Masculine Norms Inventory.
+
+
+Correlation
+```{r}
+hyp1 <- lm(PREPHQTOTAL~diagnosedwithdepression, data = thesis.d)
+summary(hyp1)
+```
+```{r}
+hyp2 <- lm(PREPHQTOTAL ~ CMTOTAL + diagnosedwithdepression, data = thesis.d)
+summary(hyp2)
+
+library(QuantPsyc)
+lm.beta(hyp2)
+```
+
+
+```{r}
+hyp3 <- lm(PREPHQTOTAL ~ CMTOTAL*diagnosedwithdepression, data = thesis.d)
+summary(hyp3)
+
+library(QuantPsyc)
+lm.beta(hyp2)
+```
+
+
+Hypothesis 4: After mood induction, changes on a traditional scale of depression will be mediated by scores on the Conformity to Masculine Norms Inventory, where traditional depression scores will change less with higher ratings of conformity.	
+
+
+SIMPLE mediation model
+```{r}
+med.fit <- lm(PREPHQTOTAL ~ CMTOTAL, data = thesis.d)
+out.fit <- glm(POSTPHQTOTAL ~ CMTOTAL, + data = thesis.d, family = binomial("probit"))
+med.out <- mediate(med.fit, out.fit, POSTPHQTOTAL = "treat", CMTOTAL = "emo")
+summary(med.fit)
+
+m <- lm(CMTOTAL ~ POSTPHQTOTAL + PREPHQTOTAL, data = thesis.d)
+y <- lm(Y ~ POSTPHQTOTAL + CMTOTAL + PREPHQTOTAL, data = thesis.d)
+
+sem<- another package to ATTEMPT
+```
+
+Hypothesis 5: After mood induction, changes on the Masculine Depression Scale will be mediated by scores on the Conformity to Masculine Norms Inventory, where masculine depression scores will change less with higher ratings of conformity.
+
+
+SIMPLE mediation model
 ```{r}
 
 ```
 
-## Data Wrangling including Summarizing
 
-<Discuss your process here>
+# Correlation between Hours and Essay
+```{r, echo=FALSE}
+cor.test(essay.df$essay, essay.df$hours, method = "pearson")
+```
+# Interpretation of Correlation between Hours and Essay
+Once Pearson's product-moment correlation was ran, we see a correlation (r=0.2666837) which yeilds a small effect size. Unfortunally, the hypothesis that there was a positive relationship between the time spent doing an essay and the percentage score on your essay was unsupported becausing p-value= 0.076, which is greater than .05 and therefore not significant.
+ 
 
-```{r}
+# Correlation between Hours and Grade
+```{r, echo=FALSE}
+cor.test(essay.df$hours, ngrade,  method = "spearman")
 
 ```
+Since the variable grade is not an interval dataset, we will run a alternative correlation test called Spearman's rank correlation & convert grade into a numeric. Once Spearman's rank correlation was ran,we see a correlation (r=0.1042077) which yeilds a small effect size. The hypothesis that there was a positive relationship between the time spent doing an essay and the grade rank proved to not be significant, p-value= 0.4957, which is greater than .05.
+
+
+
+
+
+
+
 
 
 ## Data Visualation
