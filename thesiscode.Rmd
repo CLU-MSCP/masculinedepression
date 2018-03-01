@@ -126,13 +126,16 @@ Correlation between CMNI and MDS(External Only)
 ```{r}
 cor.test(thesis.d$CMTOTAL, thesis.d$POSTMDSEXTERNAL)#,use ="everything", method = "pearson")
 
-scatter<-ggplot(thesis.d, aes(thesis.d$CMTOTAL, thesis.d$POSTMDSEXTERNAL))
+scatter <-ggplot(thesis.d, aes(thesis.d$CMTOTAL, thesis.d$POSTMDSEXTERNAL))
 
 scatter + geom_point(size = 2) + labs(x = "Conformity to Masculine Norms", y = "Masculine depression EXTERNAL SYMPTOMS")
 
+
+abline(lm( CMTOTAL~ POSTMDSEXTERNAL, data = thesis.d))
+
 ```
 
-#Hypothesis 2: Males who rate higher on a Masculine Conformity Scale will score higher on a Masculine Depression Scale.
+Hypothesis 2: Males who rate higher on a Masculine Conformity Scale will score higher on a Masculine Depression Scale.
 
 ## Power Analyses for Each Hypothesis
 ```{r}
@@ -148,7 +151,6 @@ scatter + geom_point(size = 2) + labs(x = "Conformity to Masculine Norms", y = "
 # Hypothesis 3: Males who report receiving a prior depression diagnosis and also rate lower on the Conformity to Masculine Norms Inventory, will score higher on a traditional scale of depression (Patient Health Questionnaire [PHQ-9]) and lower on the Masculine Depression Scale compared to men without a self-reported history of prior depression diagnosis and also rate higher on the Conformity to Masculine Norms Inventory.
 
 
-Correlation
 ```{r}
 hyp1 <- lm(PREPHQTOTAL~diagnosedwithdepression, data = thesis.d)
 summary(hyp1)
@@ -159,6 +161,12 @@ summary(hyp2)
 
 library(QuantPsyc)
 lm.beta(hyp2)
+
+
+hyp1x <- lm(PREMDSTOTAL~CMTOTAL, data = thesis.d)
+summary(hyp1x)
+
+
 ```
 
 
@@ -166,8 +174,7 @@ lm.beta(hyp2)
 hyp3 <- lm(PREPHQTOTAL ~ CMTOTAL*diagnosedwithdepression, data = thesis.d)
 summary(hyp3)
 
-library(QuantPsyc)
-lm.beta(hyp2)
+lm.beta(hyp3)
 ```
 
 
@@ -176,27 +183,66 @@ Hypothesis 4: After mood induction, changes on a traditional scale of depression
 
 SIMPLE mediation model
 ```{r}
+
+
 med.fit <- lm(CMTOTAL ~ PREPHQTOTAL, data = thesis.d)
 out.fit <- lm(POSTPHQTOTAL ~ PREPHQTOTAL + CMTOTAL, data = thesis.d)
-med.out <- mediate(med.fit, out.fit, treat = "PREPHQTOTAL", mediator = "CMTOTAL")
+med.out <- mediate(med.fit, out.fit, treat = "PREPHQTOTAL", mediator = "CMTOTAL", boot=TRUE, sims=500)
 summary(med.out)
+plot(med.out)
 ```
+
+ The estimated average causal mediation effects (ACME) 
+ average direct effects (ADE) will be equal to the effects of changing treatment from control.value to treat.value while holding the appropriate treatment status constant at either of these two values. 
+
+-
+
 
 ```{r}
 m <- lm(CMTOTAL ~ POSTPHQTOTAL + PREPHQTOTAL, data = thesis.d)
 y <- lm(Y ~ POSTPHQTOTAL + CMTOTAL + PREPHQTOTAL, data = thesis.d)
 
-sem<- another package to ATTEMPT
+# sem<- another package to ATTEMPT
 
 ```
 
-Hypothesis 5: After mood induction, changes on the Masculine Depression Scale will be mediated by scores on the Conformity to Masculine Norms Inventory, where masculine depression scores will change less with higher ratings of conformity.
+Hypothesis 5: After mood induction, changes on the Masculine Depression Scale will be mediated by scores on the Conformity to Masculine Norms Inventory, where masculine depression scores will change more with higher ratings of conformity.
 
 
 SIMPLE mediation model
 ```{r}
-
+med.fit2 <- lm(CMTOTAL ~ PREMDSTOTAL, data = thesis.d)
+out.fit2 <- lm(POSTPHQTOTAL ~ PREMDSTOTAL + CMTOTAL, data = thesis.d)
+med.out2 <- mediate(med.fit2, out.fit2, treat = "PREMDSTOTAL", mediator = "CMTOTAL")
+summary(med.out2)
+plot(med.out2)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Correlation between Hours and Essay
